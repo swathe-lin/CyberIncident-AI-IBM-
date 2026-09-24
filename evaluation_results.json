@@ -1,0 +1,133 @@
+{
+    "summary": {
+        "test_cases": 5,
+        "successful_cases": 5,
+        "entity_precision": 0.6,
+        "entity_recall": 1.0,
+        "entity_f1": 0.75,
+        "attack_classification_accuracy": 1.0,
+        "precision_at_3": 0.867,
+        "recall_at_3": 0.56,
+        "mrr": 1.0,
+        "average_latency_seconds": 0.025,
+        "grounding_rate": 1.0
+    },
+    "cases": [
+        {
+            "id": "EVAL-01",
+            "latency_seconds": 0.052,
+            "expected_attack": "Account Takeover",
+            "predicted_attack": "account takeover",
+            "attack_correct": true,
+            "expected_entities": {
+                "PERSON": "Sarah Mathews",
+                "ORGANIZATION": "NovaGrid Technologies",
+                "LOCATION": "Bucharest, Romania"
+            },
+            "actual_entities": {
+                "PERSON": [
+                    "Sarah Mathews"
+                ],
+                "ORGANIZATION": [
+                    "NovaGrid Technologies"
+                ],
+                "LOCATION": [
+                    "Bucharest",
+                    "Romania"
+                ]
+            },
+            "precision_at_3": 0.667,
+            "recall_at_3": 0.4,
+            "grounded": true
+        },
+        {
+            "id": "EVAL-02",
+            "latency_seconds": 0.016,
+            "expected_attack": "Brute Force Attack",
+            "predicted_attack": "Not detected",
+            "attack_correct": true,
+            "expected_entities": {
+                "PERSON": null,
+                "ORGANIZATION": null,
+                "LOCATION": null
+            },
+            "actual_entities": {
+                "PERSON": [],
+                "ORGANIZATION": [],
+                "LOCATION": []
+            },
+            "precision_at_3": 1.0,
+            "recall_at_3": 0.8,
+            "grounded": true
+        },
+        {
+            "id": "EVAL-03",
+            "latency_seconds": 0.019,
+            "expected_attack": "Phishing Attack",
+            "predicted_attack": "phishing",
+            "attack_correct": true,
+            "expected_entities": {
+                "PERSON": null,
+                "ORGANIZATION": "Orion Systems",
+                "LOCATION": null
+            },
+            "actual_entities": {
+                "PERSON": [],
+                "ORGANIZATION": [
+                    "Orion Systems",
+                    "Microsoft"
+                ],
+                "LOCATION": []
+            },
+            "precision_at_3": 0.667,
+            "recall_at_3": 0.4,
+            "grounded": true
+        },
+        {
+            "id": "EVAL-04",
+            "latency_seconds": 0.021,
+            "expected_attack": "Ransomware Attack",
+            "predicted_attack": "ransomware attack",
+            "attack_correct": true,
+            "expected_entities": {
+                "PERSON": null,
+                "ORGANIZATION": "BluePeak Technologies",
+                "LOCATION": null
+            },
+            "actual_entities": {
+                "PERSON": [],
+                "ORGANIZATION": [
+                    "BluePeak Technologies",
+                    "CRITICAL"
+                ],
+                "LOCATION": []
+            },
+            "precision_at_3": 1.0,
+            "recall_at_3": 0.6,
+            "grounded": true
+        },
+        {
+            "id": "EVAL-05",
+            "latency_seconds": 0.018,
+            "expected_attack": "SQL Injection",
+            "predicted_attack": "sql injection",
+            "attack_correct": true,
+            "expected_entities": {
+                "PERSON": null,
+                "ORGANIZATION": "DataCore Solutions",
+                "LOCATION": null
+            },
+            "actual_entities": {
+                "PERSON": [],
+                "ORGANIZATION": [
+                    "SQL",
+                    "DataCore Solutions"
+                ],
+                "LOCATION": []
+            },
+            "precision_at_3": 1.0,
+            "recall_at_3": 0.6,
+            "grounded": true
+        }
+    ]
+}

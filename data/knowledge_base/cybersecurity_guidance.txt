@@ -1,0 +1,625 @@
+CYBERINCIDENT AI - CYBERSECURITY INCIDENT RESPONSE KNOWLEDGE BASE
+
+PURPOSE
+This knowledge base provides general defensive guidance for analyzing and responding to cybersecurity incidents. It is intended to support incident investigation, identification, containment, eradication, recovery, and documentation. Recommendations should be adapted to the organization's policies, systems, legal requirements, and incident severity.
+
+==================================================
+1. INCIDENT RESPONSE OVERVIEW
+==================================================
+
+A cybersecurity incident is an event that may compromise the confidentiality, integrity, or availability of information systems or data.
+
+Incident response should be integrated with broader cybersecurity risk management. A response process should support preparation, detection and analysis, response activities, recovery, and continuous improvement.
+
+When analyzing an incident, consider:
+- What happened?
+- When did it happen?
+- Which systems or accounts are affected?
+- What indicators of compromise are available?
+- What attack type or behavior is suspected?
+- What data or resources may have been affected?
+- How severe is the potential impact?
+- What actions have already been taken?
+- What evidence should be preserved?
+- What additional investigation is required?
+
+==================================================
+2. INITIAL INCIDENT TRIAGE
+==================================================
+
+Initial triage determines whether an event requires incident response and helps establish its priority.
+
+Important information includes:
+- Alert or detection source
+- Date and time
+- Affected user or account
+- Affected device, server, application, or cloud resource
+- Source and destination information
+- Suspicious files, links, domains, processes, or commands
+- Authentication activity
+- Network activity
+- Data access or transfer
+- Business impact
+
+A suspected incident should be documented even when all details are not immediately available.
+
+Avoid assuming that an alert automatically proves compromise. Findings should be based on available evidence.
+
+==================================================
+3. SEVERITY ASSESSMENT
+==================================================
+
+Severity can be considered using:
+- Number of affected systems or users
+- Sensitivity of affected information
+- Privilege level of compromised accounts
+- Availability impact
+- Confidentiality impact
+- Integrity impact
+- Evidence of attacker persistence
+- Evidence of data theft
+- Potential business impact
+- Ability to contain the incident
+
+Typical prototype severity categories:
+
+LOW:
+Limited impact, isolated event, and no strong evidence of significant compromise.
+
+MEDIUM:
+Confirmed suspicious activity affecting a limited number of systems or accounts.
+
+HIGH:
+Confirmed compromise, important systems affected, significant credential exposure, or substantial operational risk.
+
+CRITICAL:
+Major service disruption, ransomware affecting important systems, significant data exposure, privileged compromise, or widespread impact.
+
+Severity should be reassessed when new evidence becomes available.
+
+==================================================
+4. PHISHING
+==================================================
+
+Phishing attempts to deceive users into opening malicious content, revealing credentials, transferring information, or performing an unsafe action.
+
+Common indicators:
+- Spoofed sender
+- Suspicious domain
+- Unexpected login request
+- Urgent or threatening language
+- Malicious attachment
+- Unexpected link
+- Credential collection page
+- Mismatched link destination
+
+Investigation actions:
+- Preserve the original email and headers when possible.
+- Identify recipients.
+- Check whether links or attachments were opened.
+- Review authentication activity.
+- Determine whether credentials were submitted.
+- Search for additional messages with similar indicators.
+- Block confirmed malicious domains or senders according to organizational procedures.
+- Reset compromised credentials when appropriate.
+
+==================================================
+5. RANSOMWARE
+==================================================
+
+Ransomware may encrypt files or systems and can cause significant availability and operational impact.
+
+Potential indicators:
+- Large numbers of renamed or encrypted files
+- Unexpected file extensions
+- Ransom messages
+- Suspicious processes
+- Unusual authentication activity
+- Backup deletion or modification
+- Rapid activity across multiple systems
+
+Response considerations:
+- Isolate affected systems to limit spread.
+- Protect unaffected systems and critical backups.
+- Preserve evidence.
+- Determine the scope of affected systems.
+- Identify the initial access path when possible.
+- Review authentication and network activity.
+- Assess whether data may also have been accessed or stolen.
+- Restore systems using trusted recovery sources after appropriate investigation.
+- Validate restored systems before returning them to normal operation.
+
+==================================================
+6. BRUTE FORCE ATTACKS
+==================================================
+
+A brute force attack involves repeated attempts to obtain access by guessing credentials or authentication secrets.
+
+Indicators:
+- Many failed authentication attempts
+- Repeated attempts against one account
+- Attempts against many accounts
+- Repeated activity from one or more source addresses
+- Authentication attempts outside normal patterns
+
+Investigation:
+- Identify targeted accounts.
+- Review authentication logs.
+- Identify source addresses and timing.
+- Determine whether any authentication attempt succeeded.
+- Check successful logins following repeated failures.
+
+Response considerations:
+- Block or rate-limit malicious sources where appropriate.
+- Enforce account lockout or other authentication controls.
+- Require stronger authentication.
+- Enable multi-factor authentication.
+- Reset credentials when compromise is suspected.
+- Monitor affected accounts.
+
+==================================================
+7. CREDENTIAL STUFFING AND ACCOUNT TAKEOVER
+==================================================
+
+Credential stuffing uses previously compromised username and password combinations against other services.
+
+Possible indicators:
+- Automated login attempts
+- Multiple accounts targeted
+- Login attempts from unusual locations
+- Successful login following many failed attempts
+- Unexpected password-reset notifications
+- Unexpected changes to account settings
+
+Response:
+- Identify potentially compromised accounts.
+- Reset affected credentials.
+- Revoke active sessions or tokens where appropriate.
+- Enable multi-factor authentication.
+- Review account activity.
+- Check for unauthorized changes.
+- Determine whether compromised credentials were reused elsewhere.
+
+==================================================
+8. MALWARE
+==================================================
+
+Malware is malicious software designed to perform unauthorized or harmful actions.
+
+Possible indicators:
+- Unknown executable
+- Unexpected process
+- Suspicious script execution
+- Unexpected network connection
+- Modified system files
+- Security software alerts
+- Unusual persistence mechanisms
+
+Investigation:
+- Identify affected devices.
+- Record suspicious files and processes.
+- Preserve relevant evidence.
+- Determine how the malware entered the environment.
+- Identify related systems.
+- Review network connections and authentication activity.
+
+Response:
+- Isolate affected systems when appropriate.
+- Remove or contain malicious software.
+- Identify and address the initial access method.
+- Scan potentially affected systems.
+- Restore systems using trusted sources where required.
+- Monitor for recurrence.
+
+==================================================
+9. SQL INJECTION AND WEB APPLICATION ATTACKS
+==================================================
+
+SQL injection involves manipulating application input so that unintended database operations may occur.
+
+Possible indicators:
+- Unexpected database errors
+- Abnormal database queries
+- Suspicious input patterns
+- Unusual database access
+- Unexpected changes to application data
+
+Investigation:
+- Identify the affected application endpoint.
+- Review web server and application logs.
+- Review database logs.
+- Determine whether unauthorized data was accessed or modified.
+- Identify the vulnerable input or application component.
+
+Defensive response:
+- Correct input validation.
+- Use parameterized database queries.
+- Apply appropriate application security controls.
+- Patch vulnerable software.
+- Review affected data and database activity.
+- Monitor the application after remediation.
+
+==================================================
+10. DENIAL OF SERVICE
+==================================================
+
+Denial-of-service activity attempts to reduce or prevent availability of a service.
+
+Possible indicators:
+- Large traffic spike
+- Unusually high request rate
+- Increased latency
+- Service unavailability
+- Large number of connections
+- Abnormal traffic patterns
+
+Response considerations:
+- Identify affected services.
+- Measure traffic and service impact.
+- Apply rate limiting or filtering where appropriate.
+- Coordinate with network or hosting providers.
+- Protect critical services.
+- Continue monitoring during and after the event.
+
+==================================================
+11. UNAUTHORIZED ACCESS
+==================================================
+
+Unauthorized access occurs when an account, device, application, or system is accessed without appropriate authorization.
+
+Indicators:
+- Unexpected login
+- Unusual access time
+- Unfamiliar source
+- Privileged account activity
+- Unexpected configuration changes
+- Access to resources outside normal user behavior
+
+Investigation:
+- Identify the account.
+- Review authentication logs.
+- Determine privileges.
+- Identify accessed systems and data.
+- Determine whether credentials were compromised.
+- Search for related activity.
+
+Response:
+- Disable or restrict compromised accounts when appropriate.
+- Revoke active sessions.
+- Reset credentials.
+- Review permissions.
+- Preserve evidence.
+- Monitor for additional unauthorized activity.
+
+==================================================
+12. DATA EXFILTRATION
+==================================================
+
+Data exfiltration involves unauthorized transfer of information from an organization's environment.
+
+Possible indicators:
+- Large outbound transfer
+- Unusual destination
+- Unexpected cloud storage activity
+- Unusual database queries
+- Large file collections
+- Abnormal network traffic
+
+Investigation:
+- Identify the affected account or system.
+- Determine what information may have been accessed.
+- Review file, database, cloud, and network logs.
+- Identify destination systems or services.
+- Determine the approximate scope of transferred information.
+
+Response:
+- Restrict unauthorized access.
+- Block confirmed malicious destinations when appropriate.
+- Preserve evidence.
+- Secure affected accounts.
+- Assess the impact and information involved.
+- Follow organizational breach notification and legal procedures where applicable.
+
+==================================================
+13. INSIDER THREATS
+==================================================
+
+An insider-related incident may involve authorized access being used in an unauthorized or harmful way.
+
+Potential indicators:
+- Unusual access to sensitive files
+- Large file copying
+- Access outside normal responsibilities
+- Unusual after-hours activity
+- Attempts to bypass controls
+
+Investigation should focus on evidence and established organizational procedures rather than assumptions about user intent.
+
+Review:
+- Access logs
+- File activity
+- Authentication records
+- Data transfer activity
+- Relevant authorization records
+
+Response should follow organizational policies, privacy requirements, legal requirements, and appropriate investigation procedures.
+
+==================================================
+14. CLOUD SECURITY INCIDENTS
+==================================================
+
+Cloud incidents may involve compromised accounts, exposed resources, unauthorized configuration changes, stolen access keys, or unexpected resource usage.
+
+Important evidence:
+- Cloud authentication logs
+- Audit logs
+- Identity and access changes
+- API activity
+- New credentials or access keys
+- Resource creation or modification
+- Network activity
+
+Response considerations:
+- Revoke compromised credentials or sessions.
+- Review identity and access permissions.
+- Investigate audit logs.
+- Identify unauthorized resources or changes.
+- Apply least-privilege controls.
+- Rotate credentials when appropriate.
+
+==================================================
+15. PRIVILEGE ESCALATION
+==================================================
+
+Privilege escalation occurs when an attacker or unauthorized user obtains higher permissions than originally available.
+
+Indicators:
+- Unexpected administrator privileges
+- Unauthorized permission changes
+- New privileged accounts
+- Suspicious processes running with elevated permissions
+- Access to restricted resources
+
+Investigation:
+- Identify the original account.
+- Determine how elevated privileges were obtained.
+- Review authentication and system logs.
+- Identify resources accessed after escalation.
+
+Response:
+- Remove unauthorized privileges.
+- Disable compromised accounts when appropriate.
+- Isolate affected systems if necessary.
+- Patch exploited weaknesses.
+- Review other accounts for similar activity.
+
+==================================================
+16. LATERAL MOVEMENT
+==================================================
+
+Lateral movement refers to activity in which an attacker moves from one compromised system or account toward additional systems.
+
+Indicators:
+- Authentication across multiple hosts
+- Unexpected remote sessions
+- Unusual administrative activity
+- New connections between internal systems
+- Reuse of compromised credentials
+
+Investigation:
+- Identify the initial compromised system.
+- Map systems contacted afterward.
+- Review authentication paths.
+- Identify accounts used.
+- Determine whether additional hosts were compromised.
+
+Response:
+- Isolate affected systems.
+- Disable compromised accounts.
+- Restrict unnecessary remote access.
+- Review segmentation and access controls.
+- Search for additional compromised hosts.
+
+==================================================
+17. DATA BREACH
+==================================================
+
+A data breach may involve unauthorized access, disclosure, modification, or loss of sensitive information.
+
+Investigation should determine:
+- What information was involved?
+- Which systems contained the information?
+- Which accounts accessed it?
+- When did access occur?
+- Was information copied or transferred?
+- How many records may be affected?
+- What evidence supports the findings?
+
+Organizations should follow applicable legal, regulatory, contractual, and internal notification procedures.
+
+==================================================
+18. SUPPLY CHAIN COMPROMISE
+==================================================
+
+A supply chain compromise may involve malicious or unauthorized changes to software, dependencies, vendors, services, or trusted third parties.
+
+Indicators:
+- Unexpected software update
+- Unexpected dependency changes
+- Modified build artifacts
+- Suspicious third-party activity
+- Integrity verification failure
+
+Investigation:
+- Identify affected software or dependency.
+- Compare trusted and affected versions.
+- Review build and deployment records.
+- Determine affected systems.
+- Check whether malicious components were distributed.
+
+Response:
+- Isolate affected components.
+- Remove compromised dependencies.
+- Restore trusted versions.
+- Review build integrity.
+- Monitor systems using the affected component.
+
+==================================================
+19. INCIDENT EVIDENCE AND LOGS
+==================================================
+
+Useful evidence may include:
+- Authentication logs
+- Endpoint security alerts
+- Firewall logs
+- Network traffic information
+- DNS logs
+- Email headers
+- Application logs
+- Database audit logs
+- Cloud audit logs
+- File access logs
+- Process information
+- System configuration changes
+- Relevant timestamps
+
+Evidence should be preserved according to organizational procedures so that investigation and later analysis remain reliable.
+
+Do not modify or destroy evidence unnecessarily during investigation.
+
+==================================================
+20. MITRE ATT&CK CONCEPTS
+==================================================
+
+MITRE ATT&CK describes adversary behavior using tactics, techniques, and sub-techniques.
+
+Tactics describe the adversary's goal or reason for performing an action.
+
+Techniques describe how the adversary performs an action.
+
+Relevant Enterprise ATT&CK tactic areas include:
+- Reconnaissance
+- Resource Development
+- Initial Access
+- Execution
+- Persistence
+- Privilege Escalation
+- Stealth
+- Defense Impairment
+- Credential Access
+- Discovery
+- Lateral Movement
+- Collection
+- Command and Control
+- Exfiltration
+- Impact
+
+An incident may involve multiple tactics and techniques.
+
+For example:
+Phishing may represent an Initial Access technique.
+Credential theft may relate to Credential Access.
+Movement between internal systems may relate to Lateral Movement.
+Unauthorized data transfer may relate to Exfiltration.
+
+ATT&CK mappings should be treated as evidence-based classifications. Do not claim a technique is confirmed when the incident description only provides weak or indirect evidence.
+
+==================================================
+21. INCIDENT ANALYSIS WORKFLOW
+==================================================
+
+When analyzing a new incident report, follow this general sequence:
+
+1. Read and normalize the incident description.
+2. Identify important entities and indicators.
+3. Determine the suspected incident or attack type.
+4. Identify affected systems, accounts, applications, and data.
+5. Assess potential severity.
+6. Identify relevant attack behaviors or ATT&CK concepts.
+7. Search historical incident records for similar cases.
+8. Retrieve relevant cybersecurity guidance.
+9. Combine retrieved evidence with the incident details.
+10. Generate a structured analysis.
+11. Clearly distinguish observed facts from inferred possibilities.
+12. Provide recommended defensive investigation or response actions.
+13. Identify the sources used.
+14. State when available evidence is insufficient.
+
+==================================================
+22. RESPONSE SAFETY AND HALLUCINATION CONTROL
+==================================================
+
+The AI assistant should prioritize evidence from retrieved knowledge.
+
+The assistant should:
+- Avoid inventing incident facts.
+- Avoid inventing indicators.
+- Avoid claiming an attack technique is confirmed without supporting evidence.
+- Distinguish facts from assumptions.
+- State when information is insufficient.
+- Prefer source-grounded recommendations.
+- Identify the knowledge sources used.
+- Avoid presenting synthetic demonstration incidents as real-world incidents.
+- Recommend consulting qualified security professionals for high-impact incidents.
+
+If the knowledge base does not contain sufficient information, the assistant should say that additional evidence or investigation is required rather than generating an unsupported answer.
+
+==================================================
+23. EXAMPLE ANALYSIS FORMAT
+==================================================
+
+For a new incident, the AI may structure its response as:
+
+Incident Summary:
+Brief description of what was observed.
+
+Likely Incident Type:
+Most relevant incident category based on available evidence.
+
+Affected Assets:
+Systems, accounts, applications, or data mentioned in the report.
+
+Indicators:
+Observed suspicious indicators.
+
+Potential ATT&CK Mapping:
+Relevant tactics or techniques supported by the evidence.
+
+Severity:
+Potential severity with a short explanation.
+
+Similar Historical Incidents:
+Relevant records retrieved from the incident knowledge base.
+
+Recommended Investigation:
+Evidence and logs that should be reviewed.
+
+Recommended Defensive Actions:
+Containment, credential protection, remediation, and recovery actions appropriate to the situation.
+
+Knowledge Sources:
+Sources retrieved and used to support the analysis.
+
+Confidence / Evidence Limitation:
+Explain uncertainty and identify information that would be needed for stronger conclusions.
+
+==================================================
+24. IMPORTANT LIMITATION
+==================================================
+
+This knowledge base supports cybersecurity incident analysis and defensive decision support. It does not replace an organization's incident response plan, security team, legal advice, regulatory requirements, or professional incident-response investigation.
+
+Recommendations should be validated against the organization's environment and policies before implementation.
+
+==================================================
+KNOWLEDGE SOURCE NOTES
+==================================================
+
+Primary guidance:
+NIST SP 800-61 Rev. 3 - Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile.
+
+Attack behavior reference:
+MITRE ATT&CK Enterprise knowledge base.
+
+Project incident examples:
+Synthetic demonstration incident records created specifically for the CyberIncident AI prototype. They are not presented as real-world incidents.
