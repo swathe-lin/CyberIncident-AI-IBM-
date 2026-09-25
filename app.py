@@ -5,6 +5,7 @@ import re
 import json
 import csv
 import io
+import time
 import base64
 from pypdf import PdfReader
 
@@ -2451,6 +2452,7 @@ analyze = st.button(
 # ============================================================
 
 if analyze:
+    analysis_start_time = time.perf_counter()
 
     if not incident_text.strip():
 
@@ -3008,29 +3010,181 @@ if analyze:
             language="text"
         )
 # ============================================================
-# EVALUATION & PERFORMANCE
+# LIVE INCIDENT EVALUATION & PERFORMANCE
 # ============================================================
 
-evaluation_file = BASE_DIR / "evaluation_results.json"
-
-if evaluation_file.exists():
+if analyze and "rag_result" in locals():
 
     try:
 
-        with open(
-            evaluation_file,
-            "r",
-            encoding="utf-8"
-        ) as f:
+        # ----------------------------------------------------
+        # LIVE INCIDENT METRICS
+        # These values are calculated from the incident
+        # currently entered/uploaded by the user.
+        # ----------------------------------------------------
 
-            evaluation_data = json.load(f)
+        retrieved = rag_result.get(
+            "retrieved_knowledge",
+            []
+        )
 
-        evaluation = evaluation_data.get("summary", {})
+        entities = rag_result.get(
+            "entities",
+            {}
+        )
+
+        # ----------------------------------------------------
+        # ENTITY CATEGORIES
+        # ----------------------------------------------------
+
+        entity_categories = [
+            "PERSON",
+            "ORGANIZATION",
+            "LOCATION",
+            "ATTACK_TYPE",
+            "SEVERITY",
+            "AFFECTED_SYSTEM",
+            "INDICATORS"
+        ]
+
+        detected_categories = 0
+
+        for category in entity_categories:
+
+            values = entities.get(
+                category,
+                []
+            )
+
+            if values:
+
+                detected_categories += 1
+
+        # ----------------------------------------------------
+        # INCIDENT EXTRACTION COVERAGE
+        # ----------------------------------------------------
+
+        extraction_coverage = (
+            detected_categories
+            /
+            len(entity_categories)
+        )
+
+        # ----------------------------------------------------
+        # RAG RELEVANCE
+        #
+        # IMPORTANT:
+        # The RAG retrieval results in this application store
+        # the similarity value using the key "score".
+        #
+        # Example:
+        # {
+        #     "text": "...",
+        #     "score": 0.1868
+        # }
+        #
+        # Therefore we read "score" here.
+        # "similarity" is kept as a fallback for compatibility.
+        # ----------------------------------------------------
+
+        similarity_scores = []
+
+        for result in retrieved:
+
+            if not isinstance(
+                result,
+                dict
+            ):
+                continue
+
+            score = result.get(
+                "score",
+                None
+            )
+
+            if score is None:
+
+                score = result.get(
+                    "similarity",
+                    None
+                )
+
+            try:
+
+                if score is not None:
+
+                    score = float(
+                        score
+                    )
+
+                    if score >= 0:
+
+                        similarity_scores.append(
+                            score
+                        )
+
+            except (
+                TypeError,
+                ValueError
+            ):
+
+                continue
+
+        # ----------------------------------------------------
+        # CALCULATE RAG SIMILARITY
+        # ----------------------------------------------------
+
+        if similarity_scores:
+
+            avg_similarity = (
+                sum(
+                    similarity_scores
+                )
+                /
+                len(
+                    similarity_scores
+                )
+            )
+
+            max_similarity = max(
+                similarity_scores
+            )
+
+        else:
+
+            avg_similarity = 0.0
+
+            max_similarity = 0.0
+
+        # ----------------------------------------------------
+        # INDICATOR COUNT
+        # ----------------------------------------------------
+
+        if isinstance(
+            indicators,
+            list
+        ):
+
+            indicator_count = len(
+                indicators
+            )
+
+        elif indicators:
+
+            indicator_count = 1
+
+        else:
+
+            indicator_count = 0
+
+        # ----------------------------------------------------
+        # CURRENT INCIDENT EVALUATION
+        # ----------------------------------------------------
 
         st.markdown(
             """
             <div class="section-title">
-                📊 Evaluation & Performance
+                📊 Incident Evaluation & Performance
             </div>
             """,
             unsafe_allow_html=True
@@ -3039,160 +3193,278 @@ if evaluation_file.exists():
         st.markdown(
             """
             <div class="section-subtitle">
-                Quantitative evaluation of the CyberIncident AI
-                detection and retrieval pipeline.
+                Live evaluation calculated from the incident
+                currently analyzed by CyberIncident AI.
             </div>
             """,
             unsafe_allow_html=True
         )
 
-        # ====================================================
-        # MAIN METRICS
-        # ====================================================
+        # ----------------------------------------------------
+        # MAIN LIVE METRICS
+        # ----------------------------------------------------
 
-        col1, col2, col3, col4 = st.columns(4)
+        eval_col1, eval_col2, eval_col3, eval_col4 = st.columns(
+            4
+        )
 
-        with col1:
-
-            st.metric(
-                label="🎯 Attack Classification",
-                value=f"{evaluation.get('attack_classification_accuracy', 0) * 100:.1f}%"
-            )
-
-        with col2:
+        with eval_col1:
 
             st.metric(
-                label="🧩 Entity F1",
-                value=f"{evaluation.get('entity_f1', 0):.3f}"
+                "🎯 Detected Attack Type",
+                attack_type
             )
 
-        with col3:
+        with eval_col2:
 
             st.metric(
-                label="📚 Precision@3",
-                value=f"{evaluation.get('precision_at_3', 0):.3f}"
+                "🧩 Entity Coverage",
+                f"{extraction_coverage * 100:.1f}%"
             )
 
-        with col4:
+        with eval_col3:
 
             st.metric(
-                label="⚡ Average Latency",
-                value=f"{evaluation.get('average_latency_seconds', 0):.3f}s"
+                "📚 Avg RAG Relevance",
+                f"{avg_similarity:.4f}"
             )
 
-        st.markdown("")
+        with eval_col4:
 
-        # ====================================================
-        # DETAILED EVALUATION
-        # ====================================================
+            st.metric(
+                "🔎 Indicators Detected",
+                str(indicator_count)
+            )
+
+        # ----------------------------------------------------
+        # DETAILED LIVE EVALUATION
+        # ----------------------------------------------------
 
         with st.expander(
-            "🔎 View Detailed Evaluation Metrics"
+            "🔎 View Live Evaluation Details"
         ):
 
-            st.markdown("### 🧩 NER / Entity Evaluation")
+            # ------------------------------------------------
+            # ENTITY DETECTION
+            # ------------------------------------------------
 
-            ner_col1, ner_col2, ner_col3 = st.columns(3)
+            st.markdown(
+                "### 🧩 Entity Detection"
+            )
 
-            with ner_col1:
+            entity_col1, entity_col2, entity_col3 = st.columns(
+                3
+            )
 
-                st.metric(
-                    "Entity Precision",
-                    f"{evaluation.get('entity_precision', 0):.3f}"
-                )
-
-            with ner_col2:
-
-                st.metric(
-                    "Entity Recall",
-                    f"{evaluation.get('entity_recall', 0):.3f}"
-                )
-
-            with ner_col3:
+            with entity_col1:
 
                 st.metric(
-                    "Entity F1",
-                    f"{evaluation.get('entity_f1', 0):.3f}"
+                    "Detected Categories",
+                    f"{detected_categories}/7"
                 )
 
-            st.markdown("---")
+            with entity_col2:
 
-            st.markdown("### 📚 RAG / Retrieval Evaluation")
+                st.metric(
+                    "Entity Coverage",
+                    f"{extraction_coverage * 100:.1f}%"
+                )
 
-            rag_col1, rag_col2, rag_col3 = st.columns(3)
+            with entity_col3:
+
+                st.metric(
+                    "Security Indicators",
+                    str(indicator_count)
+                )
+
+            st.markdown(
+                "---"
+            )
+
+            # ------------------------------------------------
+            # RAG RETRIEVAL EVALUATION
+            # ------------------------------------------------
+
+            st.markdown(
+                "### 📚 RAG Retrieval Evaluation"
+            )
+
+            rag_col1, rag_col2, rag_col3 = st.columns(
+                3
+            )
 
             with rag_col1:
 
                 st.metric(
-                    "Precision@3",
-                    f"{evaluation.get('precision_at_3', 0):.3f}"
+                    "Retrieved Sources",
+                    str(len(retrieved))
                 )
 
             with rag_col2:
 
                 st.metric(
-                    "Recall@3",
-                    f"{evaluation.get('recall_at_3', 0):.3f}"
+                    "Average Similarity",
+                    f"{avg_similarity:.4f}"
                 )
 
             with rag_col3:
 
                 st.metric(
-                    "MRR",
-                    f"{evaluation.get('mrr', 0):.3f}"
+                    "Best Similarity",
+                    f"{max_similarity:.4f}"
                 )
 
-            st.markdown("---")
+            # ------------------------------------------------
+            # SHOW ACTUAL RETRIEVAL SCORES
+            # ------------------------------------------------
 
-            st.markdown("### ⚡ System Performance")
+            if similarity_scores:
 
-            perf_col1, perf_col2, perf_col3 = st.columns(3)
+                st.markdown(
+                    "#### 🔎 Retrieved Source Scores"
+                )
+
+                for index, score in enumerate(
+                    similarity_scores,
+                    start=1
+                ):
+
+                    st.write(
+                        f"**Source {index}:** "
+                        f"{score:.4f}"
+                    )
+
+            else:
+
+                st.info(
+                    "No similarity scores were available "
+                    "for the retrieved knowledge."
+                )
+
+            st.markdown(
+                "---"
+            )
+
+            # ------------------------------------------------
+            # CURRENT INCIDENT PROCESSING
+            # ------------------------------------------------
+
+            st.markdown(
+                "### ⚡ Current Incident Processing"
+            )
+
+            processing_time = 0.0
+
+            if "analysis_start_time" in locals():
+
+                processing_time = (
+                    time.perf_counter()
+                    -
+                    analysis_start_time
+                )
+
+            perf_col1, perf_col2, perf_col3 = st.columns(
+                3
+            )
 
             with perf_col1:
 
                 st.metric(
-                    "Classification Accuracy",
-                    f"{evaluation.get('attack_classification_accuracy', 0) * 100:.1f}%"
+                    "Processing Time",
+                    f"{processing_time:.3f}s"
                 )
 
             with perf_col2:
 
                 st.metric(
-                    "Grounding Rate",
-                    f"{evaluation.get('grounding_rate', 0) * 100:.1f}%"
+                    "Severity",
+                    severity
                 )
 
             with perf_col3:
 
                 st.metric(
-                    "Test Cases",
-                    str(evaluation.get('test_cases', 0))
+                    "Attack Classification",
+                    attack_type
                 )
 
             st.markdown(
-                f"""
-                **Average Processing Latency:**  
-                `{evaluation.get('average_latency_seconds', 0):.3f} seconds`
-                """
+                "---"
             )
 
-            st.success(
-                "✓ Evaluation completed successfully on the test dataset."
+            # ------------------------------------------------
+            # LIVE INCIDENT SUMMARY
+            # ------------------------------------------------
+
+            st.markdown(
+                "### 📋 Live Incident Summary"
+            )
+
+            st.write(
+                f"**Attack Type:** {attack_type}"
+            )
+
+            st.write(
+                f"**Severity:** {severity}"
+            )
+
+            st.write(
+                f"**Affected System:** {affected_system}"
+            )
+
+            st.write(
+                f"**Entities Detected:** "
+                f"{detected_categories}/7 categories"
+            )
+
+            st.write(
+                f"**RAG Sources Retrieved:** "
+                f"{len(retrieved)}"
+            )
+
+            st.write(
+                f"**Average RAG Similarity:** "
+                f"{avg_similarity:.4f}"
+            )
+
+            st.write(
+                f"**Best RAG Similarity:** "
+                f"{max_similarity:.4f}"
+            )
+
+            # ------------------------------------------------
+            # EVALUATION STATUS
+            # ------------------------------------------------
+
+            if similarity_scores:
+
+                st.success(
+                    "✓ Live evaluation completed using "
+                    "the actual similarity scores returned "
+                    "by the RAG retrieval system."
+                )
+
+            else:
+
+                st.warning(
+                    "⚠ Live evaluation completed, but "
+                    "the RAG system did not return "
+                    "similarity scores."
+                )
+
+            st.info(
+                "These metrics describe the performance of "
+                "the current incident analysis. They are not "
+                "fixed benchmark scores and change when a "
+                "different incident is analyzed."
             )
 
     except Exception as evaluation_error:
 
         st.warning(
-            f"Evaluation results could not be displayed: "
+            f"Live evaluation could not be calculated: "
             f"{evaluation_error}"
         )
-
-else:
-
-    st.info(
-        "Evaluation results are not available yet. "
-        "Run `python evaluation.py` to generate them."
-    )
 
 
 # ============================================================
